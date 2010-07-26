@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <zmq.h>
 
@@ -13,14 +14,17 @@ int main()
 
     s = zmq_socket(ctx, ZMQ_REP);
 
-    zmq_bind(s, "tcp://lo:5555");
+    if (zmq_bind(s, "tcp://127.0.0.1:5554") < 0) {
+        printf("could not bind\n");
+        exit(-1);
+    }
 
-    printf("serving...");
     while (1) {
+        printf("listening...\n");
         zmq_msg_init(&query);
         zmq_recv(s, &query, 0);
 
-        printf("%s", (char *)zmq_msg_data(&query));
+        printf("%s\n", (char *)zmq_msg_data(&query));
         zmq_msg_close(&query);
 
         zmq_msg_init_data(&result, reply, strlen(reply), NULL, NULL);
