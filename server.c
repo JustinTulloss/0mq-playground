@@ -24,8 +24,13 @@ int main()
         zmq_msg_init(&query);
         zmq_recv(s, &query, 0);
 
-        printf("%s\n", (char *)zmq_msg_data(&query));
+        int msg_len = zmq_msg_size(&query) + 1;
+        char *out = (char *) malloc(msg_len);
+        snprintf(out, msg_len, "%s", (char *) zmq_msg_data(&query));
+        out[msg_len-1]='\0';
+        printf("%s\n", out);
         zmq_msg_close(&query);
+        free(out);
 
         zmq_msg_init_data(&result, reply, strlen(reply), NULL, NULL);
         zmq_send(s, &result, 0);
